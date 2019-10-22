@@ -3,84 +3,57 @@ One Paragraph of project description goes here
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. There are a lot improvements TBD, especially specific cloud related.
+This tutorial apply's on minikube. With couple small modifications can be used on local docker-desktop or any other kubernetes cluster.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+* kafka cli installed on build machine (part of kafka installation "bundle")
+* mvn installed on build machine
+* `mysql-0.mysql`, `zoo-0` and `broker` are pointing to 127.0.0.1 on build machine. You can do this in /etc/hosts.
+* access to `mysql-0.mysql:3306`, `zoo-0:2181` and `broker:9092` from build machine.
+Since my cluster is on minikube my build machine is my MacOS laptop.
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
-
+1. run `kafka-mysql-deploy.sh`
+it should install kafka cluster with 3 nodes, zookeeper with 2 nodes, mysql cluster with 3 nodes
+2. to pass next steps like build and topic creation must be access to `mysql-0.mysql:3306`, `zoo-0:2181` and `broker:9092` from build machine.
+fast way for minikube is just foward the ports:
 ```
-Give the example
+kubectl -n myspace port-forward zoo-0 2181
+```
+```
+kubectl -n myspace port-forward kafka-0 9092
+```
+```
+kubectl -n myspace port-forward mysql-0 3306
+```
+3. run `consumer-build-deploy.sh`
+
+The producer binds to http port 9000 and accepts post commands:
+
+```http
+POST http://localhost:9000/producer/?count=100
+Accept: */*
+Cache-Control: no-cache
 ```
 
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+where count is the number of items to publish. it will then read the number of items requested from the db and publish them to the kafka topic... 
 
 ## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+From you build machine be sure you have access to producer on port 9000.
+Or `kubectl -n myspace port-forward producer 9000`...
 
 ```
-Give an example
+curl -i -H "Accept: */*" -H "Cache-Control: no-cache" -X POST -d "value: test1" http://localhost:9000/producer/?count=100
 ```
 
-### And coding style tests
 
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+### To Be Done:
+* kafka cluster performance and availability - should be fully tested respectivately to cluster it is running on.
+* mysql cluster - SaaS preferred.
+* consumer and producer scaling should be defined but metrics, load balancing also depends on cloud provider.
+* parameters, secrets (like mysql password) must move to separated service, like kubernetes-secrets. Or cloud provider service, which is preferred
