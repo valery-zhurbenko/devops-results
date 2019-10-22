@@ -18,7 +18,7 @@ sed -i '' s/localhost:3306/$MYSQL_HOST:3306/g producer/src/main/resources/applic
 sed -i '' s/localhost:9092/$BROKER_BOOTSTRAP_HOST:9092/g producer/src/main/resources/application.properties
 
 #create topic
-kafka-topics  --zookeeper localhost:2181 --create --topic charges --replication-factor 3 --partitions 3
+kafka-topics  --zookeeper zoo-0:2181 --create --topic charges --replication-factor 3 --partitions 3
 
 #push mysql data
 mysql -u root -h $MYSQL_HOST -u root -p'123456' < init.sql
