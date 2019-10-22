@@ -1,0 +1,33 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: consumer
+  namespace: myspace
+  labels:
+    run: consumer
+spec:
+  volumes:
+    - name: default-token-mxnfr
+      secret:
+        secretName: default-token-mxnfr
+        defaultMode: 420
+    - name: configfile
+      hostPath: 
+        path: /Users⁩/valeryzhurbenko⁩/payo⁩/devops-test⁩/consumer⁩/src⁩/main⁩/resources⁩/application.properties
+  containers:
+    - name: consumer
+      image: test/consumer
+      args:
+        - imagePullPolicy=Never
+      ports:
+        - containerPort: 9001
+          protocol: TCP
+      resources: {}
+      volumeMounts:
+        - name: default-token-mxnfr
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        - name: configfile
+          readOnly: true
+          mountPath: /Users⁩/valeryzhurbenko⁩/payo⁩/devops-test⁩/consumer⁩/src⁩/main⁩/resources⁩/application.properties
+      imagePullPolicy: IfNotPresent

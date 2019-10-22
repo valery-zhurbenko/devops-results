@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: producer
+  namespace: myspace
+  labels:
+    app: producer
+spec:
+  ports:
+    - name: producer
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: producer
+  clusterIP: None
+  type: ClusterIP
+  sessionAffinity: None
+status:
+  loadBalancer: {}

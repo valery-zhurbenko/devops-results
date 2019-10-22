@@ -1,0 +1,33 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: producer
+  namespace: myspace
+  labels:
+    run: producer
+spec:
+  volumes:
+    - name: default-token-mxnfr
+      secret:
+        secretName: default-token-mxnfr
+        defaultMode: 420
+    - name: configfile
+      hostPath: 
+        path: /Users⁩/valeryzhurbenko⁩/payo⁩/devops-test⁩/producer⁩/src⁩/main⁩/resources⁩/application.properties
+  containers:
+    - name: producer
+      image: test/producer
+      args:
+        - imagePullPolicy=Never
+      ports:
+        - containerPort: 9000
+          protocol: TCP
+      resources: {}
+      volumeMounts:
+        - name: default-token-mxnfr
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        - name: configfile
+          readOnly: true
+          mountPath: /Users⁩/valeryzhurbenko⁩/payo⁩/devops-test⁩/producer⁩/src⁩/main⁩/resources⁩/application.properties
+      imagePullPolicy: IfNotPresent
